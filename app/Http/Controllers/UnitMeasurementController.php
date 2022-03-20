@@ -20,7 +20,8 @@ class UnitMeasurementController extends Controller
             $unidades = UnitMeasurement::select('id','nombre','nombre_corto')->get();
             foreach($unidades as $unidad) {
                 $unidad->label = $unidad->nombre . " (" . $unidad->nombre_corto . ")";
-                unset($unidad->nombre,$unidad->nombre_corto);
+                if($unidad->nombre_corto === "-") $unidad->nombre_corto = "";
+                unset($unidad->nombre);
             }
             $unidades[] = [
                 "label" => "Selecciona una unidad",
