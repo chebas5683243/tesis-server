@@ -10,8 +10,9 @@ class Personal extends Model
     use HasFactory;
 
     protected $table = 'personal';
+    public $timestamps = false;
 
-    public function incidentes_alertas() {
-        return $this->belongsToMany('App\Models\IncidentType', 'incident_type_alert');
+    public function incidente_alerta() {
+        return $this->belongsTo('App\Models\IncidentType');
     }
 }

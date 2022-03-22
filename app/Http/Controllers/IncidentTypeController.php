@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 use Exception;
 
 use App\Models\IncidentType;
+use App\Models\Personal;
 use App\Utils\ApiUtils;
 
 class IncidentTypeController extends Controller
 {
     public function listar(){
         try {
-            $tipos_incidente = IncidentType::with(['parametros:id','personas_alertas:id'])->orderBy('nombre','asc')->get();
+            $tipos_incidente = IncidentType::with(['parametros:id','personas_alertas'])->orderBy('nombre','asc')->get();
             foreach($tipos_incidente as $tipo_incidente) {
                 $tipo_incidente->nparametros = count($tipo_incidente->parametros);
                 $tipo_incidente->npersonas = count($tipo_incidente->personas_alertas);
@@ -48,18 +49,21 @@ class IncidentTypeController extends Controller
     public function crear(Request $request) {
         $tipo_incidente = new IncidentType;
 
-        // $empresa->ruc = $request->ruc;
-        // $empresa->razon_social = $request->razon_social;
-        // $empresa->tipo_contribuyente = $request->tipo_contribuyente;
-        // $empresa->direccion_fiscal = $request->direccion_fiscal;
-        // $empresa->distrito_ciudad = $request->distrito_ciudad;
-        // $empresa->departamento = $request->departamento;
-        // $empresa->email = $request->email;
-        // $empresa->numero_telefonico = $request->numero_telefonico;
-        // $empresa->es_propia = 0;
-        // $empresa->estado = 1;
+        $tipo_incidente->nombre = $request->nombre;
+        $tipo_incidente->estado_alerta = 1;
+        $tipo_incidente->save();
 
-        // $empresa->save();
+        foreach($request->personas_alertas as $persona_alerta) {
+            $nuevaPersona = new Personal;
+            $nuevaPersona->nombre_completo = $persona_alerta["nombre_completo"];
+            $nuevaPersona->email = $persona_alerta["email"];
+            $nuevaPersona->incident_type_id = $tipo_incidente->id;
+            $nuevaPersona->save();
+        }
+        
+        foreach($request->parametros as $parametro) {
+            $tipo_incidente->parametros()->attach($parametro["parametro"]["id"]);
+        }
 
         return ApiUtils::respuesta(true, ['tipo_incidente' => $tipo_incidente]);
     }
@@ -67,11 +71,19 @@ class IncidentTypeController extends Controller
     public function detalle($id){
         try {
             $tipo_incidente = IncidentType::with(['parametros:id,nombre','personas_alertas'])->where('id',$id)->first();
+            $count = 1;
             foreach($tipo_incidente->parametros as $parametro) {
-                unset($parametro->pivot);
+                $parametro->parametro = [
+                    "id" => $parametro->id,
+                    "label" => $parametro->nombre
+                ];
+                $parametro->id = $count;
+                unset($parametro->pivot,$parametro->nombre);
+                $parametro->existente = true;
+                $count++;
             }
-            foreach($tipo_incidente->personas_alertas as $persona_alerta) {
-                unset($persona_alerta->pivot);
+            foreach($tipo_incidente->personas_alertas as $persona) {
+                $persona->existente = true;
             }
         }
         catch (Exception $ex) {
@@ -84,16 +96,29 @@ class IncidentTypeController extends Controller
     public function editar(Request $request) {
         $tipo_incidente = IncidentType::find($request->id);
 
-        // $empresa->ruc = $request->ruc;
-        // $empresa->razon_social = $request->razon_social;
-        // $empresa->tipo_contribuyente = $request->tipo_contribuyente;
-        // $empresa->direccion_fiscal = $request->direccion_fiscal;
-        // $empresa->distrito_ciudad = $request->distrito_ciudad;
-        // $empresa->departamento = $request->departamento;
-        // $empresa->email = $request->email;
-        // $empresa->numero_telefonico = $request->numero_telefonico;
+        $tipo_incidente->nombre = $request->nombre;
 
-        // $empresa->save();
+        foreach($request->personas_alertas as $persona_alerta) {
+            if(isset($persona_alerta["eliminado"])) {
+                Personal::destroy($persona_alerta["id"]);
+            }
+            else if(isset($persona_alerta["creado"])){
+                $nuevaPersona = new Personal;
+                $nuevaPersona->nombre_completo = $persona_alerta["nombre_completo"];
+                $nuevaPersona->email = $persona_alerta["email"];
+                $nuevaPersona->incident_type_id = $tipo_incidente->id;
+                $nuevaPersona->save();
+            }
+        }
+
+        foreach($request->parametros as $parametro) {
+            if(isset($parametro["eliminado"])) {
+                $tipo_incidente->parametros()->detach($parametro["parametro"]["id"]);
+            }
+            else if(isset($parametro["creado"])){
+                $tipo_incidente->parametros()->attach($parametro["parametro"]["id"]);
+            }
+        }
 
         return ApiUtils::respuesta(true, ['tipo_incidente' => $tipo_incidente]);
     }
