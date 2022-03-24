@@ -33,6 +33,10 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function getCompleteName() {
+        return $this->primer_nombre . " " . $this->segundo_nombre . " " . $this->primer_apellido . " " . $this->segundo_apellido;
+    }
+
     public function company() {
         return $this->belongsTo('App\Models\Company');
     }

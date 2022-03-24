@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
 
 use App\Models\User;
 use App\Models\Company;
+use App\Mail\UserRegistration;
 use App\Utils\ApiUtils;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -56,6 +58,8 @@ class UserController extends Controller
         $usuario->es_admin = 0;
 
         $usuario->save();
+
+        Mail::to($usuario)->send(new UserRegistration($usuario));
 
         $usuario->codigo = "EV-USU-" . $usuario->id;
 
