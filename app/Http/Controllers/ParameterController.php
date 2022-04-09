@@ -143,4 +143,29 @@ class ParameterController extends Controller
         }
         return ApiUtils::respuesta(true, ['parametros' => $parametros]);
     }
+
+    public function listarConParametrizacion() {
+        try { 
+            $parametros = Parameter::with('unidad')->get();
+            foreach($parametros as $parametro) {
+                if($parametro->usa_estandar) $parametro->modo_parametros = "usa_estandar";
+                else if($parametro->usa_aqi) $parametro->modo_parametros = "usa_aqi";
+                else if($parametro->usa_wqi) $parametro->modo_parametros = "usa_wqi";
+                else $parametro->modo_parametros = "no_aplica";
+
+                $parametro->nombre_unidad = $parametro->unidad->nombre . " (" . $parametro->unidad->nombre_corto . ")";
+                if($parametro->unidad->nombre_corto === "-") $parametro->unidad->nombre_corto = "";
+
+                $parametro->label = $parametro->nombre;
+            }
+            $parametros[] = [
+                "label" => "Selecciona un parámetro",
+                "id" => 0
+            ];
+        }
+        catch (Exception $ex) {
+            return ApiUtils::respuesta(false);
+        }
+        return ApiUtils::respuesta(true, ['parametros' => $parametros]);
+    }
 }

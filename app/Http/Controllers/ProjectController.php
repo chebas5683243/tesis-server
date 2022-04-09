@@ -8,6 +8,7 @@ use Datetime;
 
 use App\Models\Project;
 use App\Models\Phase;
+use App\Models\MonitoringPoint;
 use App\Utils\ApiUtils;
 
 class ProjectController extends Controller
@@ -210,5 +211,11 @@ class ProjectController extends Controller
         }
 
         return false;
+    }
+
+    public function puntosMonitoreos($id) {
+        $puntos = MonitoringPoint::where('project_id', $id)->get();
+        
+        return ApiUtils::respuesta(true, ['puntos' => $puntos]);
     }
 }

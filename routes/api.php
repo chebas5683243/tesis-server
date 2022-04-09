@@ -9,6 +9,7 @@ use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\ParameterController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UnitMeasurementController;
+use App\Http\Controllers\MonitoringPointController;
 use App\Http\Controllers\UserController;
 
 Route::group([
@@ -66,6 +67,7 @@ Route::group([
     Route::get('/listar', [ParameterController::class, 'listar']);
     Route::post('/crear', [ParameterController::class, 'crear']);
     Route::get('/simpleListar', [ParameterController::class, 'simpleListar']);
+    Route::get('/listarConParametrizacion', [ParameterController::class, 'listarConParametrizacion']);
     Route::put('/editar', [ParameterController::class, 'editar']);
     Route::get('/detalle/{id}', [ParameterController  ::class, 'detalle']);
 });
@@ -77,6 +79,7 @@ Route::group([
     Route::post('/crear', [ProjectController::class, 'crear']);
     Route::put('/editar', [ProjectController::class, 'editar']);
     Route::get('/detalle/{id}', [ProjectController::class, 'detalle']);
+    Route::get('/{id}/puntos', [ProjectController::class, 'puntosMonitoreos']);
 });
 
 Route::group([
@@ -87,4 +90,14 @@ Route::group([
     Route::post('/crear', [UnitMeasurementController::class, 'crear']);
     Route::put('/editar', [UnitMeasurementController::class, 'editar']);
     Route::get('/detalle/{id}', [UnitMeasurementController::class, 'detalle']);
+});
+
+Route::group([
+    'prefix' => 'puntos'
+], function($route) {
+    Route::post('/crear', [MonitoringPointController::class, 'crear']);
+    Route::post('/modificarParametro', [MonitoringPointController::class, 'modificarParametro']);
+    Route::put('/editar', [MonitoringPointController::class, 'editar']);
+    Route::get('/detalle/{id}', [MonitoringPointController::class, 'detalle']);
+    Route::get('/{id}/parametros', [MonitoringPointController::class, 'listarParametros']);
 });
