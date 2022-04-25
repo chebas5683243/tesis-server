@@ -10,11 +10,12 @@ use App\Utils\ApiUtils;
 class ParameterController extends Controller
 {
     public function listar() {
-        $parametros = Parameter::with(['unidad'])->orderBy('nombre')->get();
+        $parametros = Parameter::with(['unidad','tipos_incidentes','parametros_monitoreo'])->orderBy('nombre')->get();
 
         foreach($parametros as $parametro) {
+            $parametro->can_delete = (count($parametro->tipos_incidentes) + count($parametro->parametros_monitoreo)) === 0;
             $parametro->unidadMedida = $parametro->unidad->nombre . " (" . $parametro->unidad->nombre_corto . ")";
-            unset($parametro->unidad);
+            unset($parametro->unidad, $parametro->tipos_incidentes, $parametro->parametros_monitoreo);
             unset($parametro->tiene_maximo,$parametro->tiene_minimo,$parametro->valor_maximo,$parametro->valor_minimo);
         }
 
@@ -48,6 +49,7 @@ class ParameterController extends Controller
             $parametro->aqi_5 = $request->aqi_5;
         } else if($parametro->usa_wqi) {
             $parametro->valor_ideal = $request->valor_ideal;
+            $parametro->valor_estandar_permisible = $request->valor_estandar_permisible;
         }
 
         $parametro->timestamps = false;
@@ -89,6 +91,7 @@ class ParameterController extends Controller
         $parametro->aqi_4 = null;
         $parametro->aqi_5 = null;
         $parametro->valor_ideal = null;
+        $parametro->valor_estandar_permisible = null;
         $parametro->tiene_maximo = false;
         $parametro->valor_maximo = null;
         $parametro->tiene_minimo = false;
@@ -114,6 +117,7 @@ class ParameterController extends Controller
         else if($request->usa_wqi) {
             $parametro->usa_wqi = true;
             $parametro->valor_ideal = $request->valor_ideal;
+            $parametro->valor_estandar_permisible = $request->valor_estandar_permisible;
         }
         else {
             $parametro->no_aplica = true;
@@ -167,5 +171,11 @@ class ParameterController extends Controller
             return ApiUtils::respuesta(false);
         }
         return ApiUtils::respuesta(true, ['parametros' => $parametros]);
+    }
+
+    public function eliminar($id) {
+        $parametro = Parameter::find($id);
+        $parametro->delete();
+        return ApiUtils::respuesta(true);
     }
 }

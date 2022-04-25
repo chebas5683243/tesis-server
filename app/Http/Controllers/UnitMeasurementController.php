@@ -10,7 +10,12 @@ use App\Utils\ApiUtils;
 class UnitMeasurementController extends Controller
 {
     public function listar() {
-        $unidades = UnitMeasurement::orderBy('nombre')->get();
+        $unidades = UnitMeasurement::with('parametros:id,unit_id')->orderBy('nombre')->get();
+
+        foreach($unidades as $unidad) {
+            $unidad->can_delete = count($unidad->parametros) === 0;
+            unset($unidad->parametros);
+        }
 
         return ApiUtils::respuesta(true, ['unidades' => $unidades]);
     }
@@ -62,5 +67,11 @@ class UnitMeasurementController extends Controller
         $unidad->save();
 
         return ApiUtils::respuesta(true, ['unidad' => $unidad]);
+    }
+
+    public function eliminar($id) {
+        $unidad = UnitMeasurement::find($id);
+        $unidad->delete();
+        return ApiUtils::respuesta(true);
     }
 }

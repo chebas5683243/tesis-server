@@ -4,13 +4,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\IncidentTypeController;
-use App\Http\Controllers\ParameterController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\UnitMeasurementController;
-use App\Http\Controllers\MonitoringPointController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RecordController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ParameterController;
+use App\Http\Controllers\IncidentTypeController;
+use App\Http\Controllers\MonitoringPointController;
+use App\Http\Controllers\UnitMeasurementController;
 
 Route::group([
     'prefix' => 'auth'
@@ -59,6 +60,7 @@ Route::group([
     Route::post('/desactivar', [UserController::class, 'desactivar']);
     Route::post('/cambiarPassword', [UserController::class, 'cambiarPassword']);
     Route::get('/detalle/{id}', [UserController::class, 'detalle']);
+    Route::get('/export', [UserController::class, 'export']);
 });
 
 Route::group([
@@ -69,7 +71,8 @@ Route::group([
     Route::get('/simpleListar', [ParameterController::class, 'simpleListar']);
     Route::get('/listarConParametrizacion', [ParameterController::class, 'listarConParametrizacion']);
     Route::put('/editar', [ParameterController::class, 'editar']);
-    Route::get('/detalle/{id}', [ParameterController  ::class, 'detalle']);
+    Route::get('/detalle/{id}', [ParameterController::class, 'detalle']);
+    Route::delete('/{id}', [ParameterController::class, 'eliminar']);
 });
 
 Route::group([
@@ -90,6 +93,7 @@ Route::group([
     Route::post('/crear', [UnitMeasurementController::class, 'crear']);
     Route::put('/editar', [UnitMeasurementController::class, 'editar']);
     Route::get('/detalle/{id}', [UnitMeasurementController::class, 'detalle']);
+    Route::delete('/{id}', [UnitMeasurementController::class, 'eliminar']);
 });
 
 Route::group([
@@ -98,6 +102,17 @@ Route::group([
     Route::post('/crear', [MonitoringPointController::class, 'crear']);
     Route::post('/modificarParametro', [MonitoringPointController::class, 'modificarParametro']);
     Route::put('/editar', [MonitoringPointController::class, 'editar']);
+    Route::put('/desactivar/{id}', [MonitoringPointController::class, 'desactivar']);
+    Route::put('/activar/{id}', [MonitoringPointController::class, 'activar']);
     Route::get('/detalle/{id}', [MonitoringPointController::class, 'detalle']);
     Route::get('/{id}/parametros', [MonitoringPointController::class, 'listarParametros']);
+    Route::get('/{id}/registros', [MonitoringPointController::class, 'listarRegistros']);
+});
+
+Route::group([
+    'prefix' => 'registros'
+], function($route) {
+    Route::get('/punto/{puntoId}', [RecordController::class, 'exportTemplate']);
+    Route::post('/importar', [RecordController::class, 'importRecordData']);
+    Route::get('/{id}', [RecordController::class, 'reporteRegistro']);
 });

@@ -18,4 +18,8 @@ class Parameter extends Model
     public function tipos_incidentes() {
         return $this->belongsToMany('App\Models\IncidentType', 'incident_type_parameter');
     }
+
+    public function parametros_monitoreo() {
+        return $this->hasMany('App\Models\MonitoringPointParameter', 'parameter_id');
+    }
 }

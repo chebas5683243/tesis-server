@@ -12,7 +12,7 @@ class MonitoringPoint extends Model
     protected $table = 'monitoring_point';
     
     public function proyecto() {
-        return $this->belongsTo('App\Models\Project');
+        return $this->belongsTo('App\Models\Project', 'project_id');
     }
 
     public function parametros() {

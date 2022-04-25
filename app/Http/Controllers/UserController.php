@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Excel;
 use Exception;
-use Illuminate\Support\Str;
-
 use App\Models\User;
-use App\Models\Company;
-use App\Mail\UserRegistration;
 use App\Utils\ApiUtils;
+
+use Illuminate\Support\Str;
+use App\Exports\UsersExport;
+use Illuminate\Http\Request;
+use App\Mail\UserRegistration;
 use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
@@ -150,5 +151,10 @@ class UserController extends Controller
             return ApiUtils::respuesta(false);
         }
         return ApiUtils::respuesta(true, ['usuarios' => $usuarios]);
+    }
+
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'invoices.xlsx');
     }
 }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MonitoringPoint;
-use App\Models\MonitoringPointParameter;
+use App\Models\Record;
 use App\Utils\ApiUtils;
 use Illuminate\Http\Request;
+use App\Models\MonitoringPoint;
+use App\Models\MonitoringPointParameter;
 
 class MonitoringPointController extends Controller
 {
@@ -48,7 +49,7 @@ class MonitoringPointController extends Controller
     }
 
     public function listarParametros($id) {
-        $parametros = MonitoringPointParameter::with('parametro')->where('monitoring_point_id', $id)->get();
+        $parametros = MonitoringPointParameter::with('parametro.unidad')->where('monitoring_point_id', $id)->get();
 
         foreach($parametros as $parametro) {
             unset($parametro->updated_at, $parametro->created_at, $parametro->id, $parametro->monitoring_point_id);
@@ -57,6 +58,9 @@ class MonitoringPointController extends Controller
 
             $parametro->nombre = $parametro->parametro->nombre;
             $parametro->nombre_corto = $parametro->parametro->nombre_corto;
+            $parametro->unidad = $parametro->parametro->unidad;
+            $parametro->nombre_unidad = $parametro->parametro->unidad->nombre . " (" . $parametro->parametro->unidad->nombre_corto . ")";
+            if($parametro->parametro->unidad->nombre_corto === "-") $parametro->unidad->nombre_corto = "";
             unset($parametro->parametro);
 
             if($parametro->usa_estandar) $parametro->modo_parametros = "usa_estandar";
@@ -78,6 +82,7 @@ class MonitoringPointController extends Controller
             'aqi_4' => $request->aqi_4,
             'aqi_5' => $request->aqi_5,
             'valor_ideal' => $request->valor_ideal,
+            'valor_estandar_permisible' => $request->valor_estandar_permisible,
             'tiene_maximo' => $request->tiene_maximo,
             'valor_maximo' => $request->valor_maximo,
             'tiene_minimo' => $request->tiene_minimo,
@@ -93,6 +98,47 @@ class MonitoringPointController extends Controller
         if($update_result === 0) {
             $punto->parametros()->attach($request->id, $parametrizacion);
         }
+
+        return ApiUtils::respuesta(true);
+    }
+
+    public function listarRegistros($id) {
+        $registros = Record::with([
+            'registrador:id,primer_nombre,segundo_nombre,primer_apellido,segundo_apellido',
+            'valoresParametros:id,record_id,valor_cuantitativo,valor_cualitativo'
+        ])->where('monitoring_point_id', $id)->get();
+
+        foreach($registros as $registro) {
+            $parametros_considerados = 0;
+            $total_parametros = 0;
+            foreach($registro->valoresParametros as $valorParametro) {
+                $total_parametros++;
+                if($valorParametro->valor_cuantitativo !== null || $valorParametro->valor_cualitativo !== null) {
+                    $parametros_considerados++;
+                }
+            }
+            $registro->parametros_considerados = $parametros_considerados;
+            $registro->total_parametros = $total_parametros;
+            $registro->registrado_por = $registro->registrador->primer_nombre . ' ' . $registro->registrador->segundo_nombre . ' ' .
+                $registro->registrador->primer_apellido . ' ' . $registro->registrador->segundo_apellido;
+            unset($registro->valoresParametros, $registro->registrador);
+        }
+    
+        return ApiUtils::respuesta(true, ['registros' => $registros]);
+    }
+
+    public function desactivar($id) {
+        $punto = MonitoringPoint::find($id);
+        $punto->estado = 0;
+        $punto->save();
+
+        return ApiUtils::respuesta(true);
+    }
+
+    public function activar($id) {
+        $punto = MonitoringPoint::find($id);
+        $punto->estado = 1;
+        $punto->save();
 
         return ApiUtils::respuesta(true);
     }
