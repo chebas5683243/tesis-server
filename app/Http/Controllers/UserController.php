@@ -28,7 +28,6 @@ class UserController extends Controller
                                     $usuario->primer_nombre . " " .
                                     $usuario->segundo_nombre;
                 $usuario->empresa = $usuario->company->razon_social;
-                $usuario->estado = $usuario->estado ? "Activo" : "Inactivo";
                 unset($usuario->primer_apellido, $usuario->segundo_apellido, $usuario->primer_nombre, $usuario->segundo_nombre);
                 unset($usuario->company,$usuario->company_id,$usuario->created_at,$usuario->deleted_at,$usuario->updated_at);
                 unset($usuario->numero_celular,$usuario->es_admin);

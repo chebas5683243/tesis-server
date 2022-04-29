@@ -18,4 +18,8 @@ class MonitoringPoint extends Model
     public function parametros() {
         return $this->belongsToMany('App\Models\Parameter', 'monitoring_point_parameter');
     }
+
+    public function registros() {
+        return $this->hasMany('App\Models\Record','monitoring_point_id');
+    }
 }

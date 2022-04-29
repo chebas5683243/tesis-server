@@ -15,7 +15,7 @@ class Company extends Model
     // protected $fillable = [];
 
     public function usuarios() {
-        return $this->hasMany('App\Models\User');
+        return $this->hasMany('App\Models\User','company_id');
     }
 
 }

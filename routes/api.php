@@ -56,8 +56,8 @@ Route::group([
     Route::get('/simpleListar/empresa/{id}', [UserController::class, 'simpleListar']);
     Route::post('/crear', [UserController::class, 'crear']);
     Route::put('/editar', [UserController::class, 'editar']);
-    Route::post('/activar', [UserController::class, 'activar']);
-    Route::post('/desactivar', [UserController::class, 'desactivar']);
+    Route::put('/activar/{id}', [UserController::class, 'activar']);
+    Route::put('/desactivar/{id}', [UserController::class, 'desactivar']);
     Route::post('/cambiarPassword', [UserController::class, 'cambiarPassword']);
     Route::get('/detalle/{id}', [UserController::class, 'detalle']);
     Route::get('/export', [UserController::class, 'export']);

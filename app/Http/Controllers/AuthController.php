@@ -28,9 +28,11 @@ class AuthController extends Controller
     public function login(){
         $credentials = request(['email', 'password']);
 
-        $user = User::where('email',$credentials['email'])->where('password',$credentials['password'])->first();
+        $user = User::with('company')->where('email',$credentials['email'])->where('password',$credentials['password'])->first();
 
-        if($user) $token = JWTAuth::fromUser($user);
+        $can_login = $user && $user->estado && $user->company->estado;
+
+        if($can_login) $token = JWTAuth::fromUser($user);
         else return response()->json(['error' => 'Unauthorized']);
         
         return $this->respondWithToken($token,$user);

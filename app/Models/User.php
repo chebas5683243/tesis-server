@@ -38,6 +38,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function company() {
-        return $this->belongsTo('App\Models\Company');
+        return $this->belongsTo('App\Models\Company', 'company_id');
     }
 }

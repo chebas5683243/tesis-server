@@ -50,6 +50,8 @@ class ProjectController extends Controller
                 'empresa_ejecutora:id,razon_social as label',
                 'responsable_externo:id,primer_apellido,segundo_apellido,primer_nombre,segundo_nombre',
                 'responsable_propio:id,primer_apellido,segundo_apellido,primer_nombre,segundo_nombre',
+                'puntos:id,project_id',
+                'puntos.registros:id,monitoring_point_id',
                 'fases'
             ])->where('id',$id)->first();
 
@@ -59,6 +61,13 @@ class ProjectController extends Controller
             $proyecto->fecha_fin_tentativa = strtotime($proyecto->fecha_fin_tentativa);
             $proyecto->fecha_fin_tentativa = date('Y-m-d', $proyecto->fecha_fin_tentativa);
 
+            $proyecto->cantidad_puntos = count($proyecto->puntos);
+            $proyecto->cantidad_registros = 0;
+
+            foreach($proyecto->puntos as $punto) {
+                $proyecto->cantidad_registros += count($punto->registros);
+            }
+
             if($proyecto->fecha_fin) {
                 $proyecto->fecha_fin = strtotime($proyecto->fecha_fin);
                 $proyecto->fecha_fin = date('Y-m-d', $proyecto->fecha_fin); 
@@ -67,7 +76,7 @@ class ProjectController extends Controller
             }
 
             unset($proyecto->empresa_ejecutora_id, $proyecto->responsable_externo_id, $proyecto->responsable_propio_id);
-            unset($proyecto->created_at, $proyecto->updated_at, $proyecto->deleted_at);
+            unset($proyecto->created_at, $proyecto->updated_at, $proyecto->deleted_at, $proyecto->puntos);
             $proyecto->responsable_externo->label = $proyecto->responsable_externo->primer_nombre . " " . $proyecto->responsable_externo->segundo_nombre . " " . $proyecto->responsable_externo->primer_apellido . " " . $proyecto->responsable_externo->segundo_apellido;
             $proyecto->responsable_propio->label = $proyecto->responsable_propio->primer_nombre . " " . $proyecto->responsable_propio->segundo_nombre . " " . $proyecto->responsable_propio->primer_apellido . " " . $proyecto->responsable_propio->segundo_apellido;
 
