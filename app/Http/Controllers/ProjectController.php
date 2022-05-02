@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Exception;
 use Datetime;
+use Exception;
+use JWTAuth;
+use App\Models\Phase;
 
 use App\Models\Project;
-use App\Models\Phase;
-use App\Models\MonitoringPoint;
 use App\Utils\ApiUtils;
+use Illuminate\Http\Request;
+use App\Models\MonitoringPoint;
+use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class ProjectController extends Controller
 {
+    protected $user;
+
+    public function __construct() {
+        $this->middleware('jwt.auth');
+        $this->user = JWTAuth::parseToken()->authenticate();
+    }
+
     public function listar(){
         try {
             $proyectos = Project::with(['empresa_ejecutora'])->orderBy('codigo','asc')->get();
@@ -39,6 +49,40 @@ class ProjectController extends Controller
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);
+        }
+
+        return ApiUtils::respuesta(true, ['proyectos' => $proyectos]);
+    }
+
+    public function listarMonitoreo(){
+        $userType = $this->user->tipo;
+        $whereParams = [['estado', '!=', 2]];
+        if ($userType === 2) {
+            $whereParams[] = ['responsable_propio_id', $this->user->id];
+        }
+        else if ($userType === 3) {
+            $whereParams[] = ['responsable_externo_id', $this->user->id];
+        }
+        $proyectos = Project::with(['empresa_ejecutora'])->where($whereParams)->orderBy('codigo','asc')->get();
+
+        foreach($proyectos as $proyecto) {
+            $proyecto->empresa = $proyecto->empresa_ejecutora->razon_social;
+
+            if($proyecto->fecha_inicio) {
+                $inicio = new Datetime($proyecto->fecha_inicio);
+                $proyecto->fecha_inicio = $inicio->format('Y-m-d');
+            }
+            else $proyecto->fecha_inicio = "-";
+
+            if($proyecto->fecha_fin) {
+                $fin = new Datetime($proyecto->fecha_fin);
+                $proyecto->fecha_fin = $fin->format('Y-m-d');
+            }
+            else $proyecto->fecha_fin = "-";
+
+            unset($proyecto->created_at,$proyecto->updated_at,$proyecto->deleted_at,$proyecto->descripcion);
+            unset($proyecto->estado,$proyecto->fecha_fin_tentativa,$proyecto->responsable_externo_id);
+            unset($proyecto->responsable_propio_id,$proyecto->empresa_ejecutora_id,$proyecto->empresa_ejecutora);
         }
 
         return ApiUtils::respuesta(true, ['proyectos' => $proyectos]);

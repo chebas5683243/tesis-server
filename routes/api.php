@@ -79,6 +79,7 @@ Route::group([
     'prefix' => 'proyectos'
 ], function($route) {
     Route::get('/listar', [ProjectController::class, 'listar']);
+    Route::get('/listarMonitoreo', [ProjectController::class, 'listarMonitoreo']);
     Route::post('/crear', [ProjectController::class, 'crear']);
     Route::put('/editar', [ProjectController::class, 'editar']);
     Route::get('/detalle/{id}', [ProjectController::class, 'detalle']);

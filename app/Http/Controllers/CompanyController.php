@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Exception;
+use JWTAuth;
 
 use App\Models\Company;
 use App\Utils\ApiUtils;
 
 class CompanyController extends Controller
 {
+    protected $user;
+
+    public function __construct() {
+        $this->middleware('jwt.auth');
+    }
+
     public function listar(){
         try {
             $empresas = Company::orderBy('razon_social','asc')->get();
