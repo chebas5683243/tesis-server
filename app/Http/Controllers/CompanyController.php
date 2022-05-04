@@ -35,13 +35,14 @@ class CompanyController extends Controller
 
     public function simpleListar() {
         try { 
-            $empresas = Company::select('id','razon_social')->get();
+            $empresas = Company::select('id','razon_social','es_propia')->get();
             foreach($empresas as $empresa) {
                 $empresa->label = $empresa->razon_social;
                 unset($empresa->razon_social);
             }
             $empresas[] = [
                 "label" => "Selecciona una empresa",
+                "es_propia" => false,
                 "id" => 0
             ];
         }

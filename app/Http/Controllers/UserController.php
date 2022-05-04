@@ -12,6 +12,7 @@ use App\Exports\UsersExport;
 use Illuminate\Http\Request;
 use App\Mail\UserRegistration;
 use Illuminate\Support\Facades\Mail;
+use App\Models\Company;
 
 class UserController extends Controller
 {
@@ -30,7 +31,7 @@ class UserController extends Controller
                 $usuario->empresa = $usuario->company->razon_social;
                 unset($usuario->primer_apellido, $usuario->segundo_apellido, $usuario->primer_nombre, $usuario->segundo_nombre);
                 unset($usuario->company,$usuario->company_id,$usuario->created_at,$usuario->deleted_at,$usuario->updated_at);
-                unset($usuario->numero_celular,$usuario->es_admin);
+                unset($usuario->numero_celular,$usuario->tipo);
             }
         }
         catch (Exception $ex) {
@@ -55,7 +56,14 @@ class UserController extends Controller
         $usuario->segundo_apellido = $request->segundo_apellido;
         $usuario->segundo_nombre = $request->segundo_nombre;
         $usuario->password = Str::random(10);
-        $usuario->es_admin = 0;
+        if ($request->es_admin) {
+            $usuario->tipo = 1;
+        }
+        else {
+            $company = Company::find($request->company["id"]);
+            if ($company->es_propia) $usuario->tipo = 2;
+            else $usuario->tipo = 3;
+        }
 
         $usuario->save();
 
@@ -80,6 +88,14 @@ class UserController extends Controller
         $usuario->primer_nombre = $request->primer_nombre;
         $usuario->segundo_apellido = $request->segundo_apellido;
         $usuario->segundo_nombre = $request->segundo_nombre;
+        if ($request->es_admin) {
+            $usuario->tipo = 1;
+        }
+        else {
+            $company = Company::find($request->company["id"]);
+            if ($company->es_propia) $usuario->tipo = 2;
+            else $usuario->tipo = 3;
+        }
 
         $usuario->save();
 
@@ -87,7 +103,9 @@ class UserController extends Controller
     }
 
     public function detalle($id){
-        $usuario = User::with(['company:id,razon_social as label'])->where('id',$id)->first();
+        $usuario = User::with(['company:id,razon_social as label,es_propia'])->where('id',$id)->first();
+
+        $usuario->es_admin = $usuario->tipo === 1;
         
         return ApiUtils::respuesta(true, ['usuario' => $usuario]);
     }

@@ -9,7 +9,7 @@
     <meta name="format-detection" content="address=no"> <!-- disable auto address linking in iOS -->
     <meta name="format-detection" content="email=no"> <!-- disable auto email linking in iOS -->
     <meta name="author" content="Sebastian Flores">
-    <title>¡Has sido registrado en Ecoviewer!</title>
+    <title>Notificación de datos anómalos</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -119,10 +119,10 @@
         <div class="separator-header"></div>
         <div class="content">
             <p class="greeting">
-                Bienvenido {{$user->getCompleteName()}},
+                asd
             </p>
             <p class="information">
-                has sido registrado en la plataforma Ecoviewer, por favor ingresa al siguiente enlace para ver la información relacionada a tu perfil
+                se han registrado datos anómalos en el 
             </p>
             <div class="button-container">
                 <button class="go-to-app">
