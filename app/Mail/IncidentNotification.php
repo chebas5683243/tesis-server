@@ -11,11 +11,19 @@ class IncidentNotification extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public $proyecto;
+    public $puntoMonitoreo;
+    public $registro;
+    public $registrador;
+    public $parametros;
 
-    public function __construct($user)
+    public function __construct($proyecto, $puntoMonitoreo, $registro, $registrador, $parametros)
     {
-        $this->user = $user;
+        $this->proyecto = $proyecto;
+        $this->puntoMonitoreo = $puntoMonitoreo;
+        $this->registro = $registro;
+        $this->registrador = $registrador;
+        $this->parametros = $parametros;
     }
 
     public function build()

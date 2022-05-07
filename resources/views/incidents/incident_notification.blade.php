@@ -72,6 +72,7 @@
         .content {
             width: 80%;
             margin: auto;
+            color: black;
         }
 
         .content .greeting {
@@ -81,6 +82,16 @@
         .content .information {
             align-self: center;
             text-align: justify;
+            color: black;
+        }
+
+        .content .details-container .name-info {
+            font-weight: 600;
+            color: #0030A8;
+        }
+
+        .content .details-container .valor-info {
+            color: black;
         }
 
         .content .button-container {
@@ -118,11 +129,51 @@
         </div>
         <div class="separator-header"></div>
         <div class="content">
-            <p class="greeting">
-                asd
-            </p>
             <p class="information">
-                se han registrado datos anómalos en el 
+                Se han registrado datos anómalos en un punto de monitoreo de un proyecto del sistema. Se recomienda revisarlo lo más antes posible.
+            </p>
+            <p class="information" style="margin: 8px 0px;">
+                Resumen de la anomalía:
+            </p>
+            <div class="details-container">
+                <ul>
+                    <li>
+                        <span class="name-info">Proyecto: </span>
+                        <span class="valor-info">{{$proyecto->codigo . ' - ' . $proyecto->nombre}}</span>
+                    </li>
+                    <li>
+                        <span class="name-info">Punto de Monitoreo: </span>
+                        <span class="valor-info">{{$puntoMonitoreo->codigo . ' - ' . $puntoMonitoreo->nombre}}</span>
+                    </li>
+                    <li>
+                        <span class="name-info">Registro: </span>
+                        <span class="valor-info">{{$registro->codigo}}</span>
+                    </li>
+                    <li>
+                        <span class="name-info">Fecha y hora :</span>
+                        <span class="valor-info">{{date("d/m/Y H:i:s")}}</span>
+                    </li>
+                    <li>
+                        <span class="name-info">Registrado por :</span>
+                        <span class="valor-info">{{$registrador->getCompleteName()}}</span>
+                    </li>
+                </ul>
+            </div>
+            <p class="information" style="margin: 16px 0px 8px 0px;">
+                Los parámetros anómalos fueron los siguientes:
+            </p>
+            <div class="details-container">
+                <ul>
+                    @foreach ($parametros as $parametro)
+                        <li>
+                            <span class="name-info">{{$parametro['parametro']['nombre']}}: </span>
+                            <span class="valor-info">{{$parametro['valor'] . ' - ' . $parametro['etiqueta']['info']}}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <p class="information" style="margin: 16px 0px 8px 0px;">
+                Para mayor detalle, acceder a la plataforma.
             </p>
             <div class="button-container">
                 <button class="go-to-app">
