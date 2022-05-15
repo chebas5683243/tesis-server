@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\ParameterController;
 use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\MonitoringPointController;
@@ -116,4 +117,16 @@ Route::group([
     Route::get('/punto/{puntoId}', [RecordController::class, 'exportTemplate']);
     Route::post('/importar', [RecordController::class, 'importRecordData']);
     Route::get('/{id}', [RecordController::class, 'reporteRegistro']);
+});
+
+Route::group([
+    'prefix' => 'incidentes'
+], function($route) {
+    Route::get('/listar', [IncidentController::class, 'listar']);
+    // Route::post('/crear', [CompanyController::class, 'crear']);
+    // Route::get('/simpleListar', [CompanyController::class, 'simpleListar']);
+    // Route::get('/detalle/{id}', [CompanyController::class, 'detalle']);
+    // Route::put('/editar', [CompanyController::class, 'editar']);
+    // Route::put('/activar/{id}', [CompanyController::class, 'activar']);
+    // Route::put('/desactivar/{id}', [CompanyController::class, 'desactivar']);
 });
