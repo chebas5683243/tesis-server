@@ -26,4 +26,16 @@ class Incident extends Model
     public function investigacion() {
         return $this->belongsTo('App\Models\Investigation','investigation_id');
     }
+
+    public function causas() {
+        return $this->hasMany('App\Models\ImmediateCause','incident_id');
+    }
+
+    public function accionesInmediatas() {
+        return $this->hasMany('App\Models\ImmediateAction','incident_id');
+    }
+
+    public function punto() {
+        return $this->belongsTo('App\Models\MonitoringPoint','monitoring_point_id');
+    }
 }

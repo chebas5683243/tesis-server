@@ -9,6 +9,7 @@ use App\Http\Controllers\RecordController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\CauseTypeController;
 use App\Http\Controllers\ParameterController;
 use App\Http\Controllers\IncidentTypeController;
 use App\Http\Controllers\MonitoringPointController;
@@ -85,6 +86,7 @@ Route::group([
     Route::put('/editar', [ProjectController::class, 'editar']);
     Route::get('/detalle/{id}', [ProjectController::class, 'detalle']);
     Route::get('/{id}/puntos', [ProjectController::class, 'puntosMonitoreos']);
+    Route::get('/simpleListar', [ProjectController::class, 'simpleListar']);
 });
 
 Route::group([
@@ -123,6 +125,15 @@ Route::group([
     'prefix' => 'incidentes'
 ], function($route) {
     Route::get('/listar', [IncidentController::class, 'listar']);
+    Route::post('/crear', [IncidentController::class, 'crear']);
+    Route::get('/detalle/{id}', [IncidentController::class, 'detalle']);
+    Route::put('/editar', [IncidentController::class, 'editar']);
+});
+
+Route::group([
+    'prefix' => 'causas'
+], function($route) {
+    Route::get('/listar', [CauseTypeController::class, 'listar']);
     // Route::post('/crear', [CompanyController::class, 'crear']);
     // Route::get('/simpleListar', [CompanyController::class, 'simpleListar']);
     // Route::get('/detalle/{id}', [CompanyController::class, 'detalle']);

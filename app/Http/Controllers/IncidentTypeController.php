@@ -29,16 +29,18 @@ class IncidentTypeController extends Controller
     }
 
     public function simpleListar() {
-        try { 
+        try {
             $tipos_incidente = IncidentType::select('id','nombre')->orderBy('nombre','asc')->get();
+            
             foreach($tipos_incidente as $tipo_incidente) {
                 $tipo_incidente->label = $tipo_incidente->nombre;
                 unset($tipo_incidente->nombre);
             }
-            $tipos_incidente[] = [
-                "label" => "Selecciona un tipo de incidente",
-                "id" => 0
-            ];
+
+            $tipos_incidente->prepend([
+                "id" => 0,
+                "label" => "Selecciona un tipo de incidente"
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);

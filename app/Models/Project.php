@@ -29,10 +29,6 @@ class Project extends Model
         return $this->hasMany('App\Models\Phase','project_id');
     }
 
-    public function puntos_monitoreo() {
-        return $this->belongsToMany('App\Models\MonitoringPoint', 'monitoring_point_parameter');
-    }
-
     public function puntos() {
         return $this->hasMany('App\Models\MonitoringPoint', 'project_id');
     }

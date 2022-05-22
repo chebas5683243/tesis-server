@@ -271,4 +271,58 @@ class ProjectController extends Controller
         
         return ApiUtils::respuesta(true, ['puntos' => $puntos]);
     }
+
+    public function simpleListar() {
+        $proyectos = Project::with([
+            'puntos:id,codigo,nombre,longitud,latitud,project_id',
+            'responsable_propio:id,primer_nombre,segundo_nombre,primer_apellido,segundo_apellido',
+            'responsable_externo:id,primer_nombre,segundo_nombre,primer_apellido,segundo_apellido'
+        ])->get();
+
+        foreach($proyectos as $proyecto) {
+            $this->setProyectoInfo($proyecto);
+        }
+
+        $proyectos->prepend([
+            "id" => 0,
+            "label" => "Selecciona un proyecto",
+            "responsable_propio" => "",
+            "responsable_externo" => "",
+            "puntos" => []
+        ]);
+        return ApiUtils::respuesta(true, ['proyectos' => $proyectos]);
+    }
+
+    public function setProyectoInfo($proyecto) {
+        $proyecto->label = $proyecto->codigo . ' - ' . $proyecto->nombre;
+        $responsable_propio = $proyecto->responsable_propio->getCompleteName();
+        $responsable_externo = $proyecto->responsable_externo->getCompleteName();
+        unset($proyecto->responsable_propio, $proyecto->responsable_externo);
+        $proyecto->responsable_propio = $responsable_propio;
+        $proyecto->responsable_externo = $responsable_externo;
+        unset($proyecto->nombre, $proyecto->codigo, $proyecto->fecha_inicio, $proyecto->fecha_fin_tentativa, $proyecto->fecha_fin);
+        unset($proyecto->ubicacion, $proyecto->estado, $proyecto->created_at, $proyecto->updated_at, $proyecto->deleted_at);
+        unset($proyecto->empresa_ejecutora_id, $proyecto->descripcion);
+
+        foreach($proyecto->puntos as $punto) {
+            $punto->label = $punto->codigo . ' - ' . $punto->nombre;
+            $punto->utmx = $punto->longitud;
+            $punto->utmy = $punto->latitud;
+            unset($punto->codigo, $punto->nombre, $punto->latitud, $punto->longitud);
+        }
+
+        $proyecto->puntos->prepend([
+            'id' => -1,
+            'label' => 'Fuera de puntos de monitoreos',
+            'utmx' => null,
+            'utmy' => null
+        ]);
+
+        $proyecto->puntos->prepend([
+            'id' => 0,
+            'label' => 'Selecciona un punto de monitoreo',
+            'utmx' => null,
+            'utmy' => null
+        ]);
+    }
 }
