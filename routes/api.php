@@ -11,7 +11,10 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\CauseTypeController;
 use App\Http\Controllers\ParameterController;
+use App\Http\Controllers\ActionTypeController;
+use App\Http\Controllers\ImpactTypeController;
 use App\Http\Controllers\IncidentTypeController;
+use App\Http\Controllers\InvestigationController;
 use App\Http\Controllers\MonitoringPointController;
 use App\Http\Controllers\UnitMeasurementController;
 
@@ -128,16 +131,39 @@ Route::group([
     Route::post('/crear', [IncidentController::class, 'crear']);
     Route::get('/detalle/{id}', [IncidentController::class, 'detalle']);
     Route::put('/editar', [IncidentController::class, 'editar']);
+    Route::get('/getInfoCrearInvestigacion/{id}', [IncidentController::class, 'getInfoCrearInvestigacion']);
+    Route::get('/exportarIncidente/{id}', [IncidentController::class, 'exportarIncidente']);
+});
+
+Route::group([
+    'prefix' => 'investigaciones'
+], function($route) {
+    Route::get('/listar', [InvestigationController::class, 'listar']);
+    Route::post('/crear', [InvestigationController::class, 'crear']);
+    Route::get('/detalle/{id}', [InvestigationController::class, 'detalle']);
+    Route::put('/guardarDatosGenerales', [InvestigationController::class, 'guardarDatosGenerales']);
+    Route::put('/guardarConsecuencias', [InvestigationController::class, 'guardarConsecuencias']);
+    Route::put('/guardarCausasAcciones', [InvestigationController::class, 'guardarCausasAcciones']);
+    Route::put('/guardarPlanAcciones', [InvestigationController::class, 'guardarPlanAcciones']);
+    Route::put('/validarInvestigacion/{id}', [InvestigationController::class, 'validarInvestigacion']);
+    Route::get('/exportarInvestigacion/{id}', [InvestigationController::class, 'exportarInvestigacion']);
+    // Route::put('/editar', [IncidentController::class, 'editar']);
 });
 
 Route::group([
     'prefix' => 'causas'
 ], function($route) {
     Route::get('/listar', [CauseTypeController::class, 'listar']);
-    // Route::post('/crear', [CompanyController::class, 'crear']);
-    // Route::get('/simpleListar', [CompanyController::class, 'simpleListar']);
-    // Route::get('/detalle/{id}', [CompanyController::class, 'detalle']);
-    // Route::put('/editar', [CompanyController::class, 'editar']);
-    // Route::put('/activar/{id}', [CompanyController::class, 'activar']);
-    // Route::put('/desactivar/{id}', [CompanyController::class, 'desactivar']);
+});
+
+Route::group([
+    'prefix' => 'tipos_impactos'
+], function($route) {
+    Route::get('/listar', [ImpactTypeController::class, 'listar']);
+});
+
+Route::group([
+    'prefix' => 'tipos_acciones'
+], function($route) {
+    Route::get('/listar', [ActionTypeController::class, 'listar']);
 });

@@ -15,10 +15,6 @@ class Incident extends Model
         return $this->belongsTo('App\Models\Project','project_id');
     }
 
-    public function reportante() {
-        return $this->belongsTo('App\Models\User','reportante_id');
-    }
-
     public function tipoIncidente() {
         return $this->belongsTo('App\Models\IncidentType','incident_type_id');
     }
