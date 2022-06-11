@@ -28,10 +28,11 @@ class UnitMeasurementController extends Controller
                 if($unidad->nombre_corto === "-") $unidad->nombre_corto = "";
                 unset($unidad->nombre);
             }
-            $unidades[] = [
+            $unidades->prepend([
+                "nombre_corto" => "",
                 "label" => "Selecciona una unidad",
                 "id" => 0
-            ];
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);

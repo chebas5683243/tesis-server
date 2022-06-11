@@ -12,6 +12,8 @@ class UserFactory extends Factory
 
     public function definition()
     {
+        $company_id = $this->faker->numberBetween(1, 100);
+
         return [
             'primer_nombre' => $this->faker->firstName,
             'segundo_nombre' => $this->faker->firstName,
@@ -22,10 +24,10 @@ class UserFactory extends Factory
             'email' => $this->faker->email,
             'numero_celular' => $this->faker->tollFreePhoneNumber,
             'cargo' => substr($this->faker->jobTitle,0,45),
-            'password' => $this->faker->password,
-            'es_admin' => 0,
+            'password' => 'sefles568',
+            'tipo' => $company_id === 1 ? 2 : 3,
             'estado' => 1,
-            'company_id' => $this->faker->numberBetween(1, 100)
+            'company_id' => $company_id
         ];
     }
 }

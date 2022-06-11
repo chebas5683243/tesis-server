@@ -28,8 +28,8 @@ class CreateInvestigationTable extends Migration
             $table->string('distrito', 100);
             $table->string('provincia', 100);
             $table->string('departamento', 100);
-            $table->float('coordenada_este');
-            $table->float('coordenada_norte');
+            $table->decimal('coordenada_este', 12, 5);
+            $table->decimal('coordenada_norte', 12, 5);
             $table->text('detalle_ubicacion');
             $table->tinyInteger('estado');
             $table->foreignId('project_id')->constrained('project');

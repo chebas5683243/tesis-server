@@ -147,6 +147,7 @@ Route::group([
     Route::put('/guardarPlanAcciones', [InvestigationController::class, 'guardarPlanAcciones']);
     Route::put('/validarInvestigacion/{id}', [InvestigationController::class, 'validarInvestigacion']);
     Route::get('/exportarInvestigacion/{id}', [InvestigationController::class, 'exportarInvestigacion']);
+    Route::post('/listarConFiltro', [InvestigationController::class, 'listarConFiltro']);
     // Route::put('/editar', [IncidentController::class, 'editar']);
 });
 

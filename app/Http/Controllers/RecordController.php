@@ -191,10 +191,10 @@ class RecordController extends Controller
             $parametros[] = $parametro;
         }
 
-        $aqi['cantidad_perc'] = $aqi['cantidad'] * 100 / $total_parametros;
-        $wqi['cantidad_perc'] = $wqi['cantidad'] * 100 / $total_parametros;
-        $estandar['cantidad_perc'] = $estandar['cantidad'] * 100 / $total_parametros;
-        $no_aplica['cantidad_perc'] = $no_aplica['cantidad'] * 100 / $total_parametros;
+        $aqi['cantidad_perc'] = number_format($aqi['cantidad'] * 100 / $total_parametros, 2);
+        $wqi['cantidad_perc'] = number_format($wqi['cantidad'] * 100 / $total_parametros, 2);
+        $estandar['cantidad_perc'] = number_format($estandar['cantidad'] * 100 / $total_parametros, 2);
+        $no_aplica['cantidad_perc'] = number_format($no_aplica['cantidad'] * 100 / $total_parametros, 2);
         return [ $parametros_considerados, $total_parametros, $parametros, $aqi, $wqi, $estandar, $no_aplica ];
     }
 

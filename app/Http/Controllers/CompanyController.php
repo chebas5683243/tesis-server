@@ -40,11 +40,11 @@ class CompanyController extends Controller
                 $empresa->label = $empresa->razon_social;
                 unset($empresa->razon_social);
             }
-            $empresas[] = [
+            $empresas->prepend([
+                "id" => 0,
                 "label" => "Selecciona una empresa",
-                "es_propia" => false,
-                "id" => 0
-            ];
+                "es_propia" => false
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);

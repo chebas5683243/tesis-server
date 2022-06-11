@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use JWTAuth;
 use App\Models\Action;
 use App\Utils\ApiUtils;
 use App\Models\Incident;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\Investigation;
 use App\Models\AffectedPerson;
 use App\Models\ImmediateCause;
 use App\Models\ImmediateAction;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\EnvironmentalImpact;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ImmediateCauseController;
@@ -21,11 +23,28 @@ use App\Http\Controllers\EnvironmentalImpactController;
 
 class InvestigationController extends Controller
 {
+    protected $user;
+
+    public function __construct() {
+        $this->middleware('jwt.auth');
+        $this->user = JWTAuth::parseToken()->authenticate();
+    }
+
     public function listar() {
+
+        $userType = $this->user->tipo;
+        $whereParams = [];
+        if ($userType === 2) {
+            $whereParams[] = ['responsable_propio_id', $this->user->id];
+        }
+        else if ($userType === 3) {
+            $whereParams[] = ['responsable_externo_id', $this->user->id];
+        }
+
         $investigaciones = Investigation::with([
             'proyecto:id,nombre',
             'tipoIncidente:id,nombre'
-        ])->get();
+        ])->where($whereParams)->get();
 
         foreach ($investigaciones as $investigacion) {
             $nombre_proyecto = $investigacion->proyecto->nombre;
@@ -295,6 +314,7 @@ class InvestigationController extends Controller
     public function validarInvestigacion($id) {
         $investigacion = Investigation::find($id);
         $investigacion->estado = 3;
+        $investigacion->fecha_fin_investigacion = date("Y-m-d");
         $investigacion->save();
         return ApiUtils::respuesta(true);
     }
@@ -323,5 +343,51 @@ class InvestigationController extends Controller
             'actions' => $investigacion->acciones
         ]);
         return $pdf->download('prueba.pdf');
+    }
+
+    public function listarConFiltro(Request $request) {
+
+        $investigacionesQuery = Investigation::select([
+                'investigation.*',
+                'project.nombre as proyecto',
+                'incident_type.nombre as tipo_incidente'
+            ])
+            ->join('project', 'project.id', '=', 'investigation.project_id')
+            ->join('incident_type', 'incident_type.id', '=', 'investigation.incident_type_id')
+            ->leftJoin('environmental_impact', 'environmental_impact.investigation_id', '=', 'investigation.id')
+            ->leftJoin('immediate_cause', 'immediate_cause.investigation_id', '=', 'investigation.id')
+            ->where('investigation.estado', 3);
+
+        if ($request->has('tiposIncidente')) {
+            $investigacionesQuery->whereIn('investigation.incident_type_id', $request->tiposIncidente);
+        }
+
+        if ($request->has('fechaInicio')) {
+            $investigacionesQuery->whereDate('investigation.fecha_incidente', '>=', $request->fechaInicio);
+        }
+
+        if ($request->has('fechaFin')) {
+            $investigacionesQuery->whereDate('investigation.fecha_incidente', '<=', $request->fechaFin);
+        }
+
+        if ($request->has('tiposImpacto')) {
+            $investigacionesQuery->whereIn('environmental_impact.impact_type_id', $request->tiposImpacto);
+        }
+
+        if ($request->has('tiposCausa')) {
+            $investigacionesQuery->whereIn('immediate_cause.cause_type_id', $request->tiposCausa);
+        }
+
+        $investigaciones = $investigacionesQuery->groupBy('investigation.id')->get();
+
+        foreach ($investigaciones as $investigacion) {
+            unset($investigacion->detalle_evento, $investigacion->localidad, $investigacion->zona_sector, $investigacion->distrito, $investigacion->provincia);
+            unset($investigacion->departamento, $investigacion->coordenada_este, $investigacion->coordenada_norte, $investigacion->detalle_ubicacion);
+            unset($investigacion->project_id, $investigacion->incident_type_id, $investigacion->created_at, $investigacion->updated_at, $investigacion->responsable_propio_id);
+            unset($investigacion->responsable_externo_id, $investigacion->monitoring_point_id, $investigacion->detalle_pre_evento, $investigacion->detalle_post_evento);
+            unset($investigacion->fecha_inicio_investigacion, $investigacion->fecha_fin_investigacion);
+        }
+
+        return ApiUtils::respuesta(true, [ 'investigaciones' => $investigaciones]);
     }
 }

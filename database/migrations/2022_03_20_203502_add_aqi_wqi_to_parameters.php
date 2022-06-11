@@ -9,12 +9,12 @@ class AddAqiWqiToParameters extends Migration
     public function up()
     {
         Schema::table('parameter', function (Blueprint $table) {
-            $table->float('aqi_1')->nullable();
-            $table->float('aqi_2')->nullable();
-            $table->float('aqi_3')->nullable();
-            $table->float('aqi_4')->nullable();
-            $table->float('aqi_5')->nullable();
-            $table->float('valor_ideal')->nullable();
+            $table->decimal('aqi_1', 12, 3)->nullable();
+            $table->decimal('aqi_2', 12, 3)->nullable();
+            $table->decimal('aqi_3', 12, 3)->nullable();
+            $table->decimal('aqi_4', 12, 3)->nullable();
+            $table->decimal('aqi_5', 12, 3)->nullable();
+            $table->decimal('valor_ideal', 12, 3)->nullable();
             $table->tinyInteger('usa_estandar')->default(1);
             $table->tinyInteger('usa_aqi');
             $table->tinyInteger('usa_wqi');

@@ -30,17 +30,17 @@ class AllTables extends Migration
             $table->string('nombre',50);
             $table->string('nombre_corto',50);
             $table->tinyInteger('tiene_maximo');
-            $table->float('valor_maximo')->nullable();
+            $table->decimal('valor_maximo', 12, 3)->nullable();
             $table->tinyInteger('tiene_minimo');
-            $table->float('valor_minimo')->nullable();
+            $table->decimal('valor_minimo', 12, 3)->nullable();
         });
         Schema::create('phase', function(Blueprint $table) {
             $table->id();
             $table->string('nombre',50);
-            $table->string('descripcion',200);
+            $table->text('descripcion');
             $table->integer('estado');
-            $table->dateTime('inicio')->nullable();
-            $table->dateTime('fin')->nullable();
+            $table->date('inicio')->nullable();
+            $table->date('fin')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

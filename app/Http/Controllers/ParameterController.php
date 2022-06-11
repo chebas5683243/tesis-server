@@ -64,11 +64,11 @@ class ParameterController extends Controller
         if($parametro->usa_estandar) $parametro->modo_parametros = "usa_estandar";
         else if($parametro->usa_aqi) $parametro->modo_parametros = "usa_aqi";
         else if($parametro->usa_wqi) $parametro->modo_parametros = "usa_wqi";
-        else $parametro->modo_parametro = "no_aplica";
+        else $parametro->modo_parametros = "no_aplica";
 
         $parametro->unidad->label = $parametro->unidad->nombre . " (" . $parametro->unidad->nombre_corto . ")";
         
-        unset($parametro->unidad->nombre, $parametro->unidad->nombre_corto);
+        unset($parametro->unidad->nombre);
 
         return ApiUtils::respuesta(true, ['parametro' => $parametro]);
     }
@@ -137,10 +137,10 @@ class ParameterController extends Controller
                 $parametro->label = $parametro->nombre;
                 unset($parametro->nombre);
             }
-            $parametros[] = [
-                "label" => "Selecciona un parámetro",
-                "id" => 0
-            ];
+            $parametros->prepend([
+                "id" => 0,
+                "label" => "Selecciona un parámetro"
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);
@@ -162,10 +162,10 @@ class ParameterController extends Controller
 
                 $parametro->label = $parametro->nombre;
             }
-            $parametros[] = [
-                "label" => "Selecciona un parámetro",
-                "id" => 0
-            ];
+            $parametros->prepend([
+                "id" => 0,
+                "label" => "Selecciona un parámetro"
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);

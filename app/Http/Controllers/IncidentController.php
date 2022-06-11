@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use JWTAuth;
 use App\Utils\ApiUtils;
 use App\Models\Incident;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,11 +16,30 @@ use App\Http\Controllers\ImmediateActionController;
 
 class IncidentController extends Controller
 {
+    protected $user;
+
+    public function __construct() {
+        $this->middleware('jwt.auth');
+        $this->user = JWTAuth::parseToken()->authenticate();
+    }
+
     public function listar() {
+
+        $userType = $this->user->tipo;
+        $whereParams = [];
+        if ($userType === 2) {
+            $whereParams[] = ['responsable_propio_id', $this->user->id];
+        }
+        else if ($userType === 3) {
+            $whereParams[] = ['responsable_externo_id', $this->user->id];
+        }
+
         $incidentes = Incident::with([
             'proyecto:id,nombre',
             'tipoIncidente:id,nombre'
-        ])->get();
+        ])->where($whereParams)->get();
+
+        Log::debug($this->user);
 
         foreach ($incidentes as $incidente) {
             $nombre_proyecto = $incidente->proyecto->nombre;

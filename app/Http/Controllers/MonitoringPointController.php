@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Record;
 use App\Utils\ApiUtils;
 use Illuminate\Http\Request;
@@ -11,7 +12,36 @@ use App\Models\MonitoringPointParameter;
 class MonitoringPointController extends Controller
 {
     public function detalle($id) {
-        $punto = MonitoringPoint::find($id);
+        $punto = MonitoringPoint::with('registros')->where('id',$id)->first();
+
+        $punto->longitud = floatval($punto->longitud);
+        $punto->latitud = floatval($punto->latitud);
+        $punto->altitud = floatval($punto->altitud);
+
+        $fecha_mas_reciente = null;
+
+        foreach($punto->registros as $registro) {
+            $fecha = Carbon::createFromFormat('Y-m-d H:i:s', $registro->fecha_registro);
+            if ($fecha_mas_reciente) {
+                if ($fecha->gt($fecha_mas_reciente)) {
+                    $fecha_mas_reciente = $fecha;
+                }
+            }
+            else {
+                $fecha_mas_reciente = $fecha;    
+            }   
+        }
+
+        $punto->fecha_mas_reciente = null;
+
+        if ($fecha_mas_reciente) {
+            $punto->fecha_mas_reciente = [
+                'fecha' => $fecha_mas_reciente->format('d-m-Y'),
+                'hora' => $fecha_mas_reciente->format('H:i:s')
+            ];
+        }
+
+        unset($punto->registros);
 
         return ApiUtils::respuesta(true, ['punto' => $punto]);
     }
@@ -22,13 +52,13 @@ class MonitoringPointController extends Controller
         $punto->nombre = $request->nombre;
         $punto->longitud = $request->longitud;
         $punto->latitud = $request->latitud;
-        $punto->altitud = $request->latitud;
+        $punto->altitud = $request->altitud;
         $punto->project_id = $request->project_id;
         $punto->estado = 1;
 
         $punto->save();
 
-        $punto->codigo = "EV-PMA-" . $punto->id;
+        $punto->codigo = 'EV-PMA-' . str_pad($punto->id, 6, '0', STR_PAD_LEFT);
 
         $punto->save();
 
@@ -91,6 +121,7 @@ class MonitoringPointController extends Controller
             'usa_aqi' => $request->usa_aqi,
             'usa_wqi' => $request->usa_wqi,
             'no_aplica' => $request->no_aplica,
+            'updated_at' => Carbon::now()
         ];
 
         $update_result = $punto->parametros()->updateExistingPivot($request->id, $parametrizacion);

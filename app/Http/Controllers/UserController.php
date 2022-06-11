@@ -141,10 +141,10 @@ class UserController extends Controller
                 $usuario->label = $usuario->primer_nombre . " " . $usuario->segundo_nombre . " " . $usuario->primer_apellido . " " . $usuario->segundo_apellido;
                 unset($usuario->razon_social);
             }
-            $usuarios[] = [
-                "label" => "Selecciona una persona",
-                "id" => 0
-            ];
+            $usuarios->prepend([
+                "id" => 0,
+                "label" => "Selecciona una persona"
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);
@@ -159,10 +159,10 @@ class UserController extends Controller
                 $usuario->label = $usuario->primer_nombre . " " . $usuario->segundo_nombre . " " . $usuario->primer_apellido . " " . $usuario->segundo_apellido;
                 unset($usuario->razon_social);
             }
-            $usuarios[] = [
-                "label" => "Selecciona una persona",
-                "id" => 0
-            ];
+            $usuarios->prepend([
+                "id" => 0,
+                "label" => "Selecciona una persona"
+            ]);
         }
         catch (Exception $ex) {
             return ApiUtils::respuesta(false);

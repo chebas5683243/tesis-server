@@ -26,6 +26,10 @@ class Investigation extends Model
         return $this->hasMany('App\Models\ImmediateCause','investigation_id');
     }
 
+    public function impactos() {
+        return $this->hasMany('App\Models\EnvironmentalImpact','investigation_id');
+    }
+
     public function accionesInmediatas() {
         return $this->hasMany('App\Models\ImmediateAction','investigation_id');
     }

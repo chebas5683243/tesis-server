@@ -10,6 +10,7 @@ class UnitMeasurement extends Model
     use HasFactory;
 
     protected $table = 'unit_measurement';
+    public $timestamps = false;
 
     public function parametros() {
         return $this->hasMany('App\Models\Parameter', 'unit_id');

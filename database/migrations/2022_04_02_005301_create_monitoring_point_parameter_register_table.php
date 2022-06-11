@@ -18,7 +18,7 @@ class CreateMonitoringPointParameterRegisterTable extends Migration
             $table->foreignId('record_id')->constrained('record');
             $table->foreignId('mpp_id')->constrained('monitoring_point_parameter');
             $table->string('valor_cualitativo')->nullable();
-            $table->float('valor_cuantitativo')->nullable();
+            $table->decimal('valor_cuantitativo', 12, 3)->nullable();
             $table->timestamps();
         });
     }

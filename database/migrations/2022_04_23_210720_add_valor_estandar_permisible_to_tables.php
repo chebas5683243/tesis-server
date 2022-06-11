@@ -14,11 +14,11 @@ class AddValorEstandarPermisibleToTables extends Migration
     public function up()
     {
         Schema::table('parameter', function (Blueprint $table) {
-            $table->float('valor_estandar_permisible')->nullable()->after('valor_ideal');
+            $table->decimal('valor_estandar_permisible', 12, 3)->nullable()->after('valor_ideal');
         });
 
         Schema::table('monitoring_point_parameter', function (Blueprint $table) {
-            $table->float('valor_estandar_permisible')->nullable()->after('valor_ideal');
+            $table->decimal('valor_estandar_permisible', 12, 3)->nullable()->after('valor_ideal');
         });
     }
 

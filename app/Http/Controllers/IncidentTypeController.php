@@ -99,6 +99,7 @@ class IncidentTypeController extends Controller
         $tipo_incidente = IncidentType::find($request->id);
 
         $tipo_incidente->nombre = $request->nombre;
+        $tipo_incidente->save();
 
         foreach($request->personas_alertas as $persona_alerta) {
             if(isset($persona_alerta["eliminado"])) {

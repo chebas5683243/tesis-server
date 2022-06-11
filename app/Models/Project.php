@@ -32,4 +32,8 @@ class Project extends Model
     public function puntos() {
         return $this->hasMany('App\Models\MonitoringPoint', 'project_id');
     }
+
+    public function incidentes() {
+        return $this->hasMany('App\Models\Incident', 'project_id');
+    }
 }

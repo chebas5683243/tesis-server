@@ -18,9 +18,9 @@ class CreateMonitoringPointTable
             $table->id();
             $table->string('codigo', 13)->nullable();
             $table->string('nombre', 100);
-            $table->float('longitud');
-            $table->float('latitud');
-            $table->float('altitud');
+            $table->decimal('longitud', 12, 5);
+            $table->decimal('latitud', 12, 5);
+            $table->decimal('altitud', 12, 5);
             $table->tinyInteger('estado');
             $table->foreignId('project_id')->constrained('project');
             $table->timestamps();

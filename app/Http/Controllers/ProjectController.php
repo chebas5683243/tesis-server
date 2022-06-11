@@ -56,7 +56,7 @@ class ProjectController extends Controller
 
     public function listarMonitoreo(){
         $userType = $this->user->tipo;
-        $whereParams = [['estado', '!=', 2]];
+        $whereParams = [];
         if ($userType === 2) {
             $whereParams[] = ['responsable_propio_id', $this->user->id];
         }
@@ -96,7 +96,8 @@ class ProjectController extends Controller
                 'responsable_propio:id,primer_apellido,segundo_apellido,primer_nombre,segundo_nombre',
                 'puntos:id,project_id',
                 'puntos.registros:id,monitoring_point_id',
-                'fases'
+                'fases',
+                'incidentes'
             ])->where('id',$id)->first();
 
             $proyecto->fecha_inicio = strtotime($proyecto->fecha_inicio);
@@ -119,6 +120,8 @@ class ProjectController extends Controller
                 $proyecto->fecha_fin = "";
             }
 
+            $proyecto->cantidad_incidentes = count($proyecto->incidentes);
+            unset($proyecto->incidentes);
             unset($proyecto->empresa_ejecutora_id, $proyecto->responsable_externo_id, $proyecto->responsable_propio_id);
             unset($proyecto->created_at, $proyecto->updated_at, $proyecto->deleted_at, $proyecto->puntos);
             $proyecto->responsable_externo->label = $proyecto->responsable_externo->primer_nombre . " " . $proyecto->responsable_externo->segundo_nombre . " " . $proyecto->responsable_externo->primer_apellido . " " . $proyecto->responsable_externo->segundo_apellido;
@@ -176,7 +179,7 @@ class ProjectController extends Controller
             }
         }
 
-        $proyecto->codigo = "EV-PRO-" . $proyecto->id;
+        $proyecto->codigo = 'EV-PRO-' . str_pad($proyecto->id, 6, '0', STR_PAD_LEFT);
 
         $proyecto->save();
 
@@ -268,6 +271,12 @@ class ProjectController extends Controller
 
     public function puntosMonitoreos($id) {
         $puntos = MonitoringPoint::where('project_id', $id)->get();
+
+        foreach ($puntos as $punto) {
+            $punto->longitud = floatval($punto->longitud);
+            $punto->latitud = floatval($punto->latitud);
+            $punto->altitud = floatval($punto->altitud);
+        }
         
         return ApiUtils::respuesta(true, ['puntos' => $puntos]);
     }

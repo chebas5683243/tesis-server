@@ -10,6 +10,7 @@ class Parameter extends Model
     use HasFactory;
 
     protected $table = 'parameter';
+    public $timestamps = false;
 
     public function unidad() {
         return $this->belongsTo('App\Models\UnitMeasurement','unit_id');
